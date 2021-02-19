@@ -27,15 +27,11 @@ output "hash" {
     value = filemd5("example.pfx")
 }
 
-variable "secret" {
-    type = string
-}
+data "azuread_client_config" "this" {}
 
 resource "random_id" "this" {
   byte_length = 8
 }
-
-data "azuread_client_config" "this" {}
 
 resource "azurerm_resource_group" "this" {
     name = "rg-${random_id.this.hex}"
@@ -82,12 +78,6 @@ resource "azurerm_key_vault_access_policy" "this" {
   ]
 }
 
-resource "azurerm_key_vault_secret" "this" {
-    name = "my-secret"
-    key_vault_id = azurerm_key_vault.this.id
-    value = var.secret
-}
-
 resource "azurerm_key_vault_certificate" "this" {
     name = "my-certificate"
     key_vault_id = azurerm_key_vault.this.id
@@ -104,7 +94,7 @@ resource "azurerm_key_vault_certificate" "this" {
         key_properties {
             exportable = false
             key_size = 4096
-            key_type = "RS A"
+            key_type = "RSA"
             reuse_key = false
         }
 
